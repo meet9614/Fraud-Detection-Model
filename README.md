@@ -19,5 +19,5 @@ A production-ready machine learning system for detecting fraudulent financial tr
 - **Operational Efficiency**: 1 fraud per 16.8 investigations
 - **Estimated Annual Savings**: $114+ Million
 
-### DataSet Link: https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
+### DataSet(500Mb) Link: https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
 
