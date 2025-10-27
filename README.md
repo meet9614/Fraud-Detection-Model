@@ -21,3 +21,39 @@ A production-ready machine learning system for detecting fraudulent financial tr
 
 ### DataSet(500Mb) Link: https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
 
+🔮 Future Enhancements
+Real-time model drift detection
+
+Ensemble methods with multiple algorithms
+
+Graph-based fraud network analysis
+
+Automated feature discovery
+
+Multi-currency support
+
+🤝 Contributing
+We welcome contributions! Please see our Contributing Guidelines for details.
+
+Fork the repository
+
+Create a feature branch (git checkout -b feature/amazing-feature)
+
+Commit your changes (git commit -m 'Add amazing feature')
+
+Push to the branch (git push origin feature/amazing-feature)
+
+Open a Pull Request
+
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+🙏 Acknowledgments
+Financial transaction dataset providers
+
+Machine learning research community
+
+Fraud detection industry best practices
+
+⭐ Star this repo if you find it helpful!
+
