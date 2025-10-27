@@ -18,3 +18,6 @@ A production-ready machine learning system for detecting fraudulent financial tr
 - **False Positive Rate**: 0.6% 
 - **Operational Efficiency**: 1 fraud per 16.8 investigations
 - **Estimated Annual Savings**: $114+ Million
+
+### DataSet Link: https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
+
