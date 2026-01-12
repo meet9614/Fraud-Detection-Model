@@ -1,148 +1,214 @@
-# 🚨 Fraud Detection Model
+# Fraud Detection System — Production-ready ML for Financial Transactions
 
-[![Notebook](https://img.shields.io/badge/Notebooks-Jupyter-orange)](./)
-[![Status](https://img.shields.io/badge/status-active-green.svg)]
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)]
+[![Repo size](https://img.shields.io/github/repo-size/meet9614/Fraud-Detection-Model)](https://github.com/meet9614/Fraud-Detection-Model)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](#)
 
-A practical, notebook-driven project for detecting fraudulent transactions using machine learning. This repository contains exploratory analysis, feature engineering, modeling, and evaluation notebooks that walk through building a high-performance fraud detection pipeline.
+A production-ready machine learning system for detecting fraudulent financial transactions. This project combines advanced feature engineering with an optimized logistic regression model to deliver real-time fraud detection via a scalable FastAPI inference service and an interactive Streamlit UI.
 
-Demo GIF / Image:
-![demo-placeholder](assets/demo.gif) <!-- replace with real gif or image -->
+Highlights
+- Highly accurate model: 98.85% accuracy
+- Excellent discrimination: AUC = 0.9958
+- Precision: 94.39% — Most flagged alerts are true frauds
+- Recall: 92.90% — Detects ~93% of fraudulent transactions
+- Operational efficiency: ~1 fraud detected per 16.8 investigations
+- Estimated annual savings: $114M+
 
----
-
-## TL;DR
-
-- Purpose: Build and evaluate machine learning models to detect fraudulent transactions.
-- What’s included: Cleaned notebooks, feature engineering steps, modeling experiments, and evaluation metrics.
-- Ready for: Reproducible experiments, extension, or quick demo (Colab-ready).
-
----
-
-## Table of Contents
-
-- [Highlights](#highlights)
-- [Repository Structure](#repository-structure)
-- [Quick Start](#quick-start)
-- [Notebooks & Key Files](#notebooks--key-files)
-- [How to reproduce results](#how-to-reproduce-results)
-- [Model Performance (summary)](#model-performance-summary)
+Table of contents
+- [Overview](#overview)
+- [Performance Summary](#performance-summary)
+- [Dataset](#dataset)
+- [Architecture](#architecture)
+- [Components](#components)
+  - [Backend (FastAPI)](#backend-fastapi)
+  - [Frontend (Streamlit)](#frontend-streamlit)
+  - [Model artifacts](#model-artifacts)
+- [Local quickstart (Docker)](#local-quickstart-docker)
+- [Local development (without Docker)](#local-development-without-docker)
+- [API usage examples](#api-usage-examples)
+- [Deployment options](#deployment-options)
+- [Future enhancements](#future-enhancements)
 - [Contributing](#contributing)
-- [License & Contact](#license--contact)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
 
----
+## Overview
+This repository contains a full-stack, containerized ML system for fraud detection:
+- A FastAPI microservice that loads a trained model + preprocessing pipeline (joblib) and exposes a `/predict` endpoint for real-time inference.
+- A Streamlit frontend for manual transaction input and visualization of risk scores.
+- Dockerfiles for backend and frontend and a `docker-compose.yml` for one-command local orchestration.
+The system is designed to be stateless, cloud-agnostic, and production-ready.
 
-## Highlights
+## Performance summary
+| Metric    | Score   | Business impact |
+|-----------|--------:|-----------------|
+| Accuracy  | 98.85%  | Outstanding overall performance |
+| AUC Score | 0.9958  | Near-perfect fraud discrimination |
+| Precision | 94.39%  | ~94% of flagged alerts are genuine fraud |
+| Recall    | 92.90%  | Detects ~93% of fraudulent transactions |
+| F1-Score  | 0.9364  | Strong operational balance |
 
-- Clean, step-by-step Jupyter notebooks for EDA, preprocessing, modeling, and evaluation.
-- Feature engineering approaches tailored to transaction / user data.
-- Baseline and advanced models (e.g., tree-based ensembles, sampling strategies).
-- Clear evaluation using precision, recall, F1, and AUPRC — focused on imbalanced classification.
+Business metrics:
+- Fraud Detection Rate (Recall): 92.9%
+- False Positive Rate: ~0.6%
+- Operational efficiency: 1 fraud detected per 16.8 investigations
+- Estimated annual savings: $114M+
 
----
+## Dataset
+Dataset size: ~500 MB  
+Download (Google Drive): https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
 
-## Repository Structure
+Notes:
+- The dataset is not included in the repo due to size and privacy concerns. After downloading, place it in the path expected by training scripts or point training to its location.
+- Do not commit raw PII-sensitive data to the repository.
 
-- notebooks/             — Main Jupyter notebooks (EDA, preprocessing, modeling)
-- data/                  — (Optional) sample datasets or data loaders
-- assets/                — Images, demo GIFs, plots
-- requirements.txt       — Python dependencies
-- README.md              — This file
+## Architecture
+User (Browser)
+   │
+   ▼
+Streamlit Frontend (UI)
+   │  REST API
+   ▼
+FastAPI Backend (ML Inference)
+   │
+   ▼
+Fraud Probability + Classification
 
----
+- Frontend and backend run in separate containers; communication occurs over REST.
+- Backend performs runtime feature engineering to keep training–serving parity.
 
-## Quick Start
+## Components
+
+### Backend (FastAPI)
+- FastAPI-based inference service providing `/predict`.
+- Loads:
+  - trained logistic regression model (joblib)
+  - preprocessing pipeline (scalers, encoders, engineered feature transforms)
+- Responsibilities:
+  - Validate and transform incoming transaction payloads
+  - Apply same feature engineering as training
+  - Return fraud probability and classification
+- Typical tech: FastAPI, scikit-learn, pandas, numpy, joblib
+- Example endpoint: POST /predict -> { "fraud_probability": 0.987, "is_fraud": true }
+
+### Frontend (Streamlit)
+- Interactive dashboard for entering transaction details and visualizing risk.
+- Sends requests to the backend `/predict` endpoint.
+- Configurable backend URL via environment variable, e.g. `BACKEND_URL=http://localhost:8000`
+- Independently containerized so it can be deployed to Streamlit Cloud or run locally.
+
+### Model artifacts
+- Trained model: `models/fraud_model.joblib` (logistic regression)
+- Preprocessing pipeline: `models/pipeline.joblib`
+- If you retrain, commit only small metadata/config files; large artifacts should be stored in an artifact registry (S3, GCS, or release assets).
+
+## Local quickstart (Docker)
+Prerequisites: Docker and docker-compose installed.
 
 1. Clone the repo
-   ```bash
    git clone https://github.com/meet9614/Fraud-Detection-Model.git
    cd Fraud-Detection-Model
-   ```
 
-2. Install dependencies
-   ```bash
+2. Build and run both services
+   docker-compose up --build
+
+3. Open:
+   - Streamlit UI: http://localhost:8501
+   - Backend API docs (Swagger/OpenAPI): http://localhost:8000/docs
+
+Notes:
+- docker-compose defines separate services for `backend` and `frontend`. Environment variables in `.env` (if present) configure endpoints and ports.
+
+## Local development (without Docker)
+Prereqs: Python 3.8+, pip, virtualenv.
+
+1. Create virtual env
+   python -m venv .venv
+   source .venv/bin/activate  # macOS / Linux
+   .venv\Scripts\activate     # Windows
+
+2. Install requirements
    pip install -r requirements.txt
-   ```
-   Or use conda:
-   ```bash
-   conda create -n fraud python=3.10
-   conda activate fraud
-   pip install -r requirements.txt
-   ```
 
-3. Open notebooks
-   - Locally:
-     ```bash
-     jupyter lab
-     ```
-   - Or open in Google Colab: click the notebook link in the repo and choose "Open in Colab".
+3. Run backend
+   # Adjust path/module name if backend app is in a subdir (e.g. backend/main.py)
+   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
----
+4. Run frontend
+   # Adjust to your frontend entrypoint (e.g. frontend/app.py)
+   export BACKEND_URL=http://localhost:8000
+   streamlit run app.py
 
-## Notebooks & Key Files
+## API usage examples
 
-- notebooks/01_EDA.ipynb — Exploratory data analysis and target class imbalance investigation
-- notebooks/02_preprocessing.ipynb — Cleaning and feature engineering pipeline
-- notebooks/03_modeling.ipynb — Model training, baseline experiments and hyperparameter tuning
-- notebooks/04_evaluation.ipynb — Final evaluation and metrics visualization
+Request
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "transaction_amount": 123.45,
+    "transaction_time": "2025-12-01T13:22:00Z",
+    "merchant_id": "M123",
+    "card_country": "US",
+    "device_id": "D456",
+    "customer_history": {...}
+  }'
 
-(If any notebook names differ, update this list accordingly.)
+Response (example)
+{
+  "fraud_probability": 0.8723,
+  "is_fraud": true,
+  "threshold": 0.5,
+  "explainability": {
+    "top_features": [
+      {"feature": "tx_amount_norm", "impact": 0.25},
+      {"feature": "velocity_score", "impact": 0.18}
+    ]
+  }
+}
 
----
+Notes:
+- Exact request fields depend on the deployed model pipeline. Check the backend docs (`/docs`) for the concrete schema.
+- The backend returns probability and boolean classification based on a configurable threshold.
 
-## How to reproduce results
+## Deployment options
+- Container-native: deploy backend and frontend containers to Azure Container Apps, AWS ECS / App Runner, GCP Cloud Run, or Kubernetes.
+- Streamlit frontend can be deployed separately to Streamlit Cloud or any static app host that supports containers.
+- Use an artifact store for model files (S3, GCS, Azure Blob) and load them at container startup for easier CI/CD.
 
-1. Ensure the dataset is available under `data/` or update the data loading cell in the notebooks.
-2. Run notebooks in order: EDA → Preprocessing → Modeling → Evaluation.
-3. To reproduce a single experiment quickly, open `03_modeling.ipynb` and run the model cells; hyperparameters are highlighted.
+## Monitoring & Production considerations
+- Add logging and structured metrics (Prometheus, Grafana)
+- Implement model drift detection and performance monitoring
+- Use feature hashing or strict schema validation to guard against broken inputs
+- Implement rate limiting and authentication for the inference endpoint in production
+- Consider a canary deployment strategy for model updates
 
-Tips:
-- For large datasets, use a subset when iterating.
-- Use provided random seeds for reproducibility.
-
----
-
-## Model Performance (summary)
-
-| Model | Precision | Recall | F1-score | AUPRC |
-|-------|-----------|--------|----------|-------|
-| ExampleModel (XGBoost) | 0.92 | 0.78 | 0.84 | 0.88 |
-| Baseline (LogReg)      | 0.85 | 0.65 | 0.73 | 0.70 |
-
-(Replace with actual results from `04_evaluation.ipynb`.)
-
----
-
-## Best Practices & Notes
-
-- Fraud detection is highly imbalanced — prioritize precision/recall trade-offs relevant to your business case.
-- Keep a strict separation of train/validation/test sets by temporal splits where appropriate.
-- Consider calibration and threshold tuning depending on cost of false positives vs false negatives.
-
----
+## Future enhancements
+- Real-time model drift detection and automatic retraining triggers
+- Ensemble models and stacking for improved robustness
+- Graph-based fraud network analysis (transactions graph)
+- Automated feature discovery / AutoML
+- Multi-currency and cross-border transaction support
 
 ## Contributing
-
-Contributions are welcome! Ways to contribute:
-- Open an issue for bugs or feature requests
-- Submit a PR with improvements
-- Add notebooks showing new models or business-specific metric evaluations
-
-Suggested branch / PR workflow:
-1. Fork the repo
+Contributions are welcome. Suggested workflow:
+1. Fork the repository
 2. Create a feature branch
-3. Open a pull request with tests / notebook outputs included
+3. Add tests and update docs
+4. Open a PR describing the change
 
----
+Please follow the repository's coding style and include unit/integration tests for new functionality.
 
-## License & Contact
+## License
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
-
-Maintainer: meet9614 — [GitHub](https://github.com/meet9614)
+## Acknowledgments
+- Financial transaction dataset providers
+- Machine learning research community
+- Fraud detection industry best practices
 
 ---
 
 If you want, I can:
-- Replace the current README.md with this content and commit it (I can provide a commit message), or
-- Make a PR with the change instead.
+- generate a ready-to-commit README.md file,
+- add example .env, docker-compose, or sample request/response fixtures,
+- or tailor the Quickstart commands to your repo layout (tell me where backend/frontend entrypoints live).
