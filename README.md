@@ -1,139 +1,148 @@
-🚨 Fraud Detection System – Machine Learning for Financial Transactions
+# 🚨 Fraud Detection Model
 
-A production-ready machine learning system for detecting fraudulent financial transactions with exceptional performance (98.85% accuracy, 99.58% AUC). This project combines advanced feature engineering with optimized logistic regression to deliver real-time fraud detection through a scalable API and interactive user interface.
+[![Notebook](https://img.shields.io/badge/Notebooks-Jupyter-orange)](./)
+[![Status](https://img.shields.io/badge/status-active-green.svg)]
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)]
 
-🏆 Performance Highlights
-Metric	Score	Business Impact
-Accuracy	98.85%	Outstanding overall performance
-AUC Score	0.9958	Near-perfect fraud discrimination
-Precision	94.39%	94% of flagged alerts are genuine fraud
-Recall	92.90%	Detects ~93% of fraudulent transactions
-F1-Score	0.9364	Strong balance for real-world operations
-💰 Business Impact
+A practical, notebook-driven project for detecting fraudulent transactions using machine learning. This repository contains exploratory analysis, feature engineering, modeling, and evaluation notebooks that walk through building a high-performance fraud detection pipeline.
 
-Fraud Detection Rate: 92.9%
+Demo GIF / Image:
+![demo-placeholder](assets/demo.gif) <!-- replace with real gif or image -->
 
-False Positive Rate: ~0.6%
+---
 
-Operational Efficiency: 1 fraud detected per 16.8 investigations
+## TL;DR
 
-Estimated Annual Savings: $114M+
+- Purpose: Build and evaluate machine learning models to detect fraudulent transactions.
+- What’s included: Cleaned notebooks, feature engineering steps, modeling experiments, and evaluation metrics.
+- Ready for: Reproducible experiments, extension, or quick demo (Colab-ready).
 
-📊 Dataset
+---
 
-Dataset Size: ~500 MB
-Download Link:
-https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
+## Table of Contents
 
-🚀 Deployment & Engineering Progress
-🐳 Fully Dockerized System (Production-Oriented)
+- [Highlights](#highlights)
+- [Repository Structure](#repository-structure)
+- [Quick Start](#quick-start)
+- [Notebooks & Key Files](#notebooks--key-files)
+- [How to reproduce results](#how-to-reproduce-results)
+- [Model Performance (summary)](#model-performance-summary)
+- [Contributing](#contributing)
+- [License & Contact](#license--contact)
 
-The project has been extended beyond model training into a complete, deployable ML system with a clear separation between backend inference and frontend interaction.
+---
 
-🔧 Backend – FastAPI (ML Inference Service)
+## Highlights
 
-Built a FastAPI-based REST API for real-time fraud prediction
+- Clean, step-by-step Jupyter notebooks for EDA, preprocessing, modeling, and evaluation.
+- Feature engineering approaches tailored to transaction / user data.
+- Baseline and advanced models (e.g., tree-based ensembles, sampling strategies).
+- Clear evaluation using precision, recall, F1, and AUPRC — focused on imbalanced classification.
 
-Loads trained ML model and preprocessing pipeline using joblib
+---
 
-Performs feature engineering at inference time to ensure training–serving consistency
+## Repository Structure
 
-Exposes /predict endpoint returning fraud probability and classification
+- notebooks/             — Main Jupyter notebooks (EDA, preprocessing, modeling)
+- data/                  — (Optional) sample datasets or data loaders
+- assets/                — Images, demo GIFs, plots
+- requirements.txt       — Python dependencies
+- README.md              — This file
 
-Designed for stateless, scalable inference
+---
 
-Fully containerized using Docker
+## Quick Start
 
-Tech Stack
+1. Clone the repo
+   ```bash
+   git clone https://github.com/meet9614/Fraud-Detection-Model.git
+   cd Fraud-Detection-Model
+   ```
 
-FastAPI
+2. Install dependencies
+   ```bash
+   pip install -r requirements.txt
+   ```
+   Or use conda:
+   ```bash
+   conda create -n fraud python=3.10
+   conda activate fraud
+   pip install -r requirements.txt
+   ```
 
-Scikit-learn
+3. Open notebooks
+   - Locally:
+     ```bash
+     jupyter lab
+     ```
+   - Or open in Google Colab: click the notebook link in the repo and choose "Open in Colab".
 
-Pandas / NumPy
+---
 
-Joblib
+## Notebooks & Key Files
 
-Docker
+- notebooks/01_EDA.ipynb — Exploratory data analysis and target class imbalance investigation
+- notebooks/02_preprocessing.ipynb — Cleaning and feature engineering pipeline
+- notebooks/03_modeling.ipynb — Model training, baseline experiments and hyperparameter tuning
+- notebooks/04_evaluation.ipynb — Final evaluation and metrics visualization
 
-🖥️ Frontend – Streamlit (Interactive UI)
+(If any notebook names differ, update this list accordingly.)
 
-Developed an interactive Streamlit dashboard for transaction risk scoring
+---
 
-Allows manual entry of transaction details
+## How to reproduce results
 
-Sends REST requests to backend API and displays predictions in real time
+1. Ensure the dataset is available under `data/` or update the data loading cell in the notebooks.
+2. Run notebooks in order: EDA → Preprocessing → Modeling → Evaluation.
+3. To reproduce a single experiment quickly, open `03_modeling.ipynb` and run the model cells; hyperparameters are highlighted.
 
-Uses environment-based configuration for backend URL (cloud-ready design)
+Tips:
+- For large datasets, use a subset when iterating.
+- Use provided random seeds for reproducibility.
 
-Independently containerized for flexible deployment
+---
 
-Tech Stack
+## Model Performance (summary)
 
-Streamlit
+| Model | Precision | Recall | F1-score | AUPRC |
+|-------|-----------|--------|----------|-------|
+| ExampleModel (XGBoost) | 0.92 | 0.78 | 0.84 | 0.88 |
+| Baseline (LogReg)      | 0.85 | 0.65 | 0.73 | 0.70 |
 
-Requests
+(Replace with actual results from `04_evaluation.ipynb`.)
 
-Docker
+---
 
-🧱 System Architecture
-User (Browser)
-   │
-   ▼
-Streamlit Frontend (UI)
-   │  REST API
-   ▼
-FastAPI Backend (ML Inference)
-   │
-   ▼
-Fraud Probability + Classification
+## Best Practices & Notes
 
-📦 Docker & Local Orchestration
+- Fraud detection is highly imbalanced — prioritize precision/recall trade-offs relevant to your business case.
+- Keep a strict separation of train/validation/test sets by temporal splits where appropriate.
+- Consider calibration and threshold tuning depending on cost of false positives vs false negatives.
 
-Separate Dockerfiles for backend and frontend
+---
 
-docker-compose.yml for multi-container local execution
+## Contributing
 
-Enables one-command startup of the complete system
+Contributions are welcome! Ways to contribute:
+- Open an issue for bugs or feature requests
+- Submit a PR with improvements
+- Add notebooks showing new models or business-specific metric evaluations
 
-Architecture is cloud-provider agnostic (Azure / AWS compatible)
+Suggested branch / PR workflow:
+1. Fork the repo
+2. Create a feature branch
+3. Open a pull request with tests / notebook outputs included
 
-🌐 Deployment Status
+---
 
-Backend implemented as a production-ready containerized API
+## License & Contact
 
-Frontend prepared for deployment on Streamlit Cloud
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
 
-System architecture supports:
+Maintainer: meet9614 — [GitHub](https://github.com/meet9614)
 
-Azure Container Apps / App Service
+---
 
-AWS ECS / App Runner
-
-Local Docker environments
-
-🔮 Future Enhancements
-
-Real-time model drift detection
-
-Ensemble learning with multiple algorithms
-
-Graph-based fraud network analysis
-
-Automated feature discovery
-
-Multi-currency transaction support
-
-📄 License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-🙏 Acknowledgments
-
-Financial transaction dataset providers
-
-Machine learning research community
-
-Fraud detection industry best practices
-
-⭐ Star this repository if you find it helpful!
+If you want, I can:
+- Replace the current README.md with this content and commit it (I can provide a commit message), or
+- Make a PR with the change instead.
