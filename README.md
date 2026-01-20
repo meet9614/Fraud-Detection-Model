@@ -1,10 +1,34 @@
-# Fraud Detection System — Production-ready ML for Financial Transactions
+# Fraud Detection System — Production-Ready ML for Financial Transactions
 
-[![Repo size](https://img.shields.io/github/repo-size/meet9614/Fraud-Detection-Model)](https://github.com/meet9614/Fraud-Detection-Model)
+[![Repo Size](https://img.shields.io/github/repo-size/meet9614/Fraud-Detection-Model)](https://github.com/meet9614/Fraud-Detection-Model)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)](#)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)](#)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-FF4B4B)](#)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED)](#)
+[![AWS](https://img.shields.io/badge/AWS-EC2-orange)](#)
 
-A production-ready machine learning system for detecting fraudulent financial transactions. This project combines advanced feature engineering with an optimized logistic regression model to deliver[...] 
+A **production-ready machine learning system** for detecting fraudulent financial transactions.  
+This project combines **domain-driven feature engineering** with an **optimized Logistic Regression model** to deliver **real-time fraud detection** via a **FastAPI inference service** and an **interactive Streamlit UI**.
+
+The system is **containerized, cloud-agnostic, and MLOps-ready**, with stateless APIs and production-focused deployment.
+
+## 🚀 Deployment Status (Live)
+
+### 🔹 What I built & deployed
+- FastAPI-based machine learning inference backend
+- Streamlit interactive frontend for transaction input and risk visualization
+- Fully Dockerized backend and frontend architecture
+- Deployed on **AWS EC2 (Ubuntu 24.04, t3.micro)**
+- Model and scaler correctly loaded inside containers at runtime
+
+### 🔹 Live Endpoints
+
+**FastAPI Swagger (Backend)**  
+https://lnkd.in/gpM7CjgQ
+
+**Streamlit UI (Frontend)**  
+http://52.66.236.66:8501
 
 Highlights
 - Highly accurate model: 98.85% accuracy
