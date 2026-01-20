@@ -1,214 +1,326 @@
-# Fraud Detection System — Production-ready ML for Financial Transactions
+# Fraud Detection System — Production-Ready ML for Financial Transactions
 
-[![Repo size](https://img.shields.io/github/repo-size/meet9614/Fraud-Detection-Model)](https://github.com/meet9614/Fraud-Detection-Model)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](#)
+**License:** MIT  
+**Language:** Python  
+**Repo size:** ~500 MB dataset (external)
 
-A production-ready machine learning system for detecting fraudulent financial transactions. This project combines advanced feature engineering with an optimized logistic regression model to deliver real-time fraud detection via a scalable FastAPI inference service and an interactive Streamlit UI.
+A production-ready machine learning system for detecting fraudulent financial transactions.
+This project combines domain-driven feature engineering with an optimized Logistic Regression model to deliver real-time fraud detection via a FastAPI inference service and an interactive Streamlit UI.
 
-Highlights
-- Highly accurate model: 98.85% accuracy
-- Excellent discrimination: AUC = 0.9958
-- Precision: 94.39% — Most flagged alerts are true frauds
-- Recall: 92.90% — Detects ~93% of fraudulent transactions
-- Operational efficiency: ~1 fraud detected per 16.8 investigations
-- Estimated annual savings: $114M+
+Note: This project has been deployed to AWS EC2 (Docker Compose). See the "AWS EC2 (Docker Compose)" section under Deployment Options for the deployment steps and notes.
 
-Table of contents
-- [Overview](#overview)
-- [Performance Summary](#performance-summary)
-- [Dataset](#dataset)
-- [Architecture](#architecture)
-- [Components](#components)
-  - [Backend (FastAPI)](#backend-fastapi)
-  - [Frontend (Streamlit)](#frontend-streamlit)
-  - [Model artifacts](#model-artifacts)
-- [Local quickstart (Docker)](#local-quickstart-docker)
-- [Local development (without Docker)](#local-development-without-docker)
-- [API usage examples](#api-usage-examples)
-- [Deployment options](#deployment-options)
-- [Future enhancements](#future-enhancements)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+---
+
+## Highlights
+
+- Accuracy: **98.85%**
+- AUC: **0.9958**
+- Precision: **94.39%**
+- Recall: **92.90%**
+- F1-Score: **0.9364**
+- Operational efficiency: **1 fraud detected per 16.8 investigations**
+- Estimated annual savings: **$114M+**
+
+---
+
+## Table of Contents
+
+- Overview
+- Performance Summary
+- Dataset
+- System Architecture
+- Components
+  - Backend (FastAPI)
+  - Frontend (Streamlit)
+- Model Artifacts
+- Local Quickstart (Docker)
+- Local Development (Without Docker)
+- API Usage Examples
+- Deployment Options
+  - AWS EC2 (Docker Compose)
+- Monitoring & Production Considerations
+- Future Enhancements
+- Contributing
+- License
+- Acknowledgments
+
+---
 
 ## Overview
-This repository contains a full-stack, containerized ML system for fraud detection:
-- A FastAPI microservice that loads a trained model + preprocessing pipeline (joblib) and exposes a `/predict` endpoint for real-time inference.
-- A Streamlit frontend for manual transaction input and visualization of risk scores.
-- Dockerfiles for backend and frontend and a `docker-compose.yml` for one-command local orchestration.
-The system is designed to be stateless, cloud-agnostic, and production-ready.
 
-## Performance summary
-| Metric    | Score   | Business impact |
-|-----------|--------:|-----------------|
-| Accuracy  | 98.85%  | Outstanding overall performance |
-| AUC Score | 0.9958  | Near-perfect fraud discrimination |
-| Precision | 94.39%  | ~94% of flagged alerts are genuine fraud |
-| Recall    | 92.90%  | Detects ~93% of fraudulent transactions |
-| F1-Score  | 0.9364  | Strong operational balance |
+This repository contains a full-stack, containerized ML system for fraud detection:
+
+- A FastAPI microservice that loads a trained ML model and preprocessing pipeline (joblib) and exposes a `/predict` endpoint.
+- A Streamlit frontend for transaction input and fraud risk visualization.
+- Dockerfiles for backend and frontend and a `docker-compose.yml` for one-command orchestration.
+
+Design goals: stateless, cloud-agnostic, production-ready, and training–serving parity via runtime feature engineering.
+
+---
+
+## Performance Summary
+
+| Metric     | Score   |
+|------------|---------|
+| Accuracy   | 98.85%  |
+| AUC        | 0.9958  |
+| Precision  | 94.39%  |
+| Recall     | 92.90%  |
+| F1-Score   | 0.9364  |
 
 Business metrics:
-- Fraud Detection Rate (Recall): 92.9%
-- False Positive Rate: ~0.6%
-- Operational efficiency: 1 fraud detected per 16.8 investigations
+- Fraud detection rate: 92.9%
+- False positive rate: ~0.6%
+- Operational efficiency: 1 fraud per 16.8 investigations
 - Estimated annual savings: $114M+
 
+---
+
 ## Dataset
-Dataset size: ~500 MB  
-Download (Google Drive): https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view?usp=drive_link
+
+- Size: ~500 MB  
+- Download: https://drive.google.com/file/d/1N5gCt0KrnwIrCbAhz3bpxMR96pegHs5n/view
 
 Notes:
-- The dataset is not included in the repo due to size and privacy concerns. After downloading, place it in the path expected by training scripts or point training to its location.
-- Do not commit raw PII-sensitive data to the repository.
+- Dataset is excluded from the repository due to size and privacy concerns.
+- Do not commit raw or PII-sensitive data.
+- Update training scripts with the local dataset path if retraining.
 
-## Architecture
+---
+
+## System Architecture
+
 User (Browser)
-   │
-   ▼
+      │
+      ▼
 Streamlit Frontend (UI)
-   │  REST API
-   ▼
+      │  REST API
+      ▼
 FastAPI Backend (ML Inference)
-   │
-   ▼
+      │
+      ▼
 Fraud Probability + Classification
 
-- Frontend and backend run in separate containers; communication occurs over REST.
-- Backend performs runtime feature engineering to keep training–serving parity.
+- Frontend and backend run in separate containers.
+- Communication occurs via REST.
+- Backend performs runtime feature engineering to ensure training–serving parity.
+
+---
 
 ## Components
 
 ### Backend (FastAPI)
-- FastAPI-based inference service providing `/predict`.
-- Loads:
-  - trained logistic regression model (joblib)
-  - preprocessing pipeline (scalers, encoders, engineered feature transforms)
-- Responsibilities:
-  - Validate and transform incoming transaction payloads
-  - Apply same feature engineering as training
-  - Return fraud probability and classification
-- Typical tech: FastAPI, scikit-learn, pandas, numpy, joblib
-- Example endpoint: POST /predict -> { "fraud_probability": 0.987, "is_fraud": true }
+Responsibilities:
+- Validate incoming transaction payloads
+- Apply the same feature engineering used during training
+- Generate fraud probability and classification
+
+Tech stack:
+- FastAPI, scikit-learn, pandas, numpy, joblib
+
+Example endpoint:
+- POST `/predict`
+
+Example response:
+```json
+{
+  "fraud_probability": 0.987,
+  "is_fraud": true
+}
+```
 
 ### Frontend (Streamlit)
-- Interactive dashboard for entering transaction details and visualizing risk.
-- Sends requests to the backend `/predict` endpoint.
-- Configurable backend URL via environment variable, e.g. `BACKEND_URL=http://localhost:8000`
-- Independently containerized so it can be deployed to Streamlit Cloud or run locally.
+- Interactive UI for transaction input
+- Displays fraud probability and risk status
+- Sends requests to the backend `/predict` endpoint
 
-### Model artifacts
-- Trained model: `models/fraud_model.joblib` (logistic regression)
-- Preprocessing pipeline: `models/pipeline.joblib`
-- If you retrain, commit only small metadata/config files; large artifacts should be stored in an artifact registry (S3, GCS, or release assets).
+Backend URL configuration:
+- `BACKEND_URL=http://<backend-host>:8000`
 
-## Local quickstart (Docker)
-Prerequisites: Docker and docker-compose installed.
-
-1. Clone the repo
-   git clone https://github.com/meet9614/Fraud-Detection-Model.git
-   cd Fraud-Detection-Model
-
-2. Build and run both services
-   docker-compose up --build
-
-3. Open:
-   - Streamlit UI: http://localhost:8501
-   - Backend API docs (Swagger/OpenAPI): http://localhost:8000/docs
-
-Notes:
-- docker-compose defines separate services for `backend` and `frontend`. Environment variables in `.env` (if present) configure endpoints and ports.
-
-## Local development (without Docker)
-Prereqs: Python 3.8+, pip, virtualenv.
-
-1. Create virtual env
-   python -m venv .venv
-   source .venv/bin/activate  # macOS / Linux
-   .venv\Scripts\activate     # Windows
-
-2. Install requirements
-   pip install -r requirements.txt
-
-3. Run backend
-   # Adjust path/module name if backend app is in a subdir (e.g. backend/main.py)
-   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-
-4. Run frontend
-   # Adjust to your frontend entrypoint (e.g. frontend/app.py)
-   export BACKEND_URL=http://localhost:8000
-   streamlit run app.py
-
-## API usage examples
-
-Request
-curl -X POST "http://localhost:8000/predict" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "transaction_amount": 123.45,
-    "transaction_time": "2025-12-01T13:22:00Z",
-    "merchant_id": "M123",
-    "card_country": "US",
-    "device_id": "D456",
-    "customer_history": {...}
-  }'
-
-Response (example)
-{
-  "fraud_probability": 0.8723,
-  "is_fraud": true,
-  "threshold": 0.5,
-  "explainability": {
-    "top_features": [
-      {"feature": "tx_amount_norm", "impact": 0.25},
-      {"feature": "velocity_score", "impact": 0.18}
-    ]
-  }
-}
-
-Notes:
-- Exact request fields depend on the deployed model pipeline. Check the backend docs (`/docs`) for the concrete schema.
-- The backend returns probability and boolean classification based on a configurable threshold.
-
-## Deployment options
-- Container-native: deploy backend and frontend containers to Azure Container Apps, AWS ECS / App Runner, GCP Cloud Run, or Kubernetes.
-- Streamlit frontend can be deployed separately to Streamlit Cloud or any static app host that supports containers.
-- Use an artifact store for model files (S3, GCS, Azure Blob) and load them at container startup for easier CI/CD.
-
-## Monitoring & Production considerations
-- Add logging and structured metrics (Prometheus, Grafana)
-- Implement model drift detection and performance monitoring
-- Use feature hashing or strict schema validation to guard against broken inputs
-- Implement rate limiting and authentication for the inference endpoint in production
-- Consider a canary deployment strategy for model updates
-
-## Future enhancements
-- Real-time model drift detection and automatic retraining triggers
-- Ensemble models and stacking for improved robustness
-- Graph-based fraud network analysis (transactions graph)
-- Automated feature discovery / AutoML
-- Multi-currency and cross-border transaction support
-
-## Contributing
-Contributions are welcome. Suggested workflow:
-1. Fork the repository
-2. Create a feature branch
-3. Add tests and update docs
-4. Open a PR describing the change
-
-Please follow the repository's coding style and include unit/integration tests for new functionality.
-
-## License
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-- Financial transaction dataset providers
-- Machine learning research community
-- Fraud detection industry best practices
+The frontend is independently containerized and can be deployed to Streamlit Cloud or any container-compatible platform.
 
 ---
 
-If you want, I can:
-- generate a ready-to-commit README.md file,
-- add example .env, docker-compose, or sample request/response fixtures,
-- or tailor the Quickstart commands to your repo layout (tell me where backend/frontend entrypoints live).
+## Model Artifacts
+
+- Trained model: `fraud_best_model.pkl`
+- Preprocessing pipeline: `fraud_scaler.pkl`
+
+Best practice:
+- Do not commit large artifacts repeatedly.
+- Use S3 / GCS / Azure Blob or release assets for production pipelines.
+- Load models from remote storage at container startup where appropriate.
+
+---
+
+## Local Quickstart (Docker)
+
+Prerequisites:
+- Docker
+- Docker Compose
+
+```bash
+git clone https://github.com/meet9614/Fraud-Detection-Model.git
+cd Fraud-Detection-Model
+docker-compose up --build
+```
+
+Access:
+- Streamlit UI: http://localhost:8501
+- FastAPI docs: http://localhost:8000/docs
+
+---
+
+## Local Development (Without Docker)
+
+Setup:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+pip install -r requirements.txt
+```
+
+Run backend:
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Run frontend:
+```bash
+export BACKEND_URL=http://localhost:8000
+streamlit run frontend/app.py
+```
+
+---
+
+## API Usage Example
+
+Example `curl`:
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{ "amount": 123.45, "oldbalanceOrg": 1000, "newbalanceOrig": 876.55 }'
+```
+
+Refer to `/docs` for the exact request schema.
+
+---
+
+## Deployment Options
+
+Supported / tested:
+- AWS EC2 (Docker Compose)
+- AWS ECS / App Runner
+- Azure Container Apps
+- GCP Cloud Run
+- Kubernetes
+
+Recommended:
+- Store model artifacts in S3 / Blob Storage
+- Load models at container startup
+- Use environment-based configuration
+- Use secrets manager for secrets
+
+### AWS EC2 (Docker Compose) — (added/updated)
+This project has been deployed to AWS EC2 using Docker Compose. Below are practical steps and notes that you can follow or adapt.
+
+1. Provision an EC2 instance
+   - Suggested instance: t3.medium or larger (adjust for traffic/model size)
+   - OS: Amazon Linux 2 / Ubuntu 22.04
+   - Security Group inbound rules:
+     - TCP 22 (SSH) — restrict to your IP
+     - TCP 80 (optional — for reverse proxy / Nginx)
+     - TCP 8000 (FastAPI) — restrict to proxy or internal network
+     - TCP 8501 (Streamlit) — restrict to proxy or internal network
+   - For production, place an ALB / Nginx in front to terminate TLS.
+
+2. Connect and install Docker & Docker Compose (example for Ubuntu)
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+3. Pull repo and start
+```bash
+git clone https://github.com/meet9614/Fraud-Detection-Model.git
+cd Fraud-Detection-Model
+# Create or edit .env with the variables below
+docker-compose up -d --build
+```
+
+4. Example `.env` (place at repo root)
+```
+BACKEND_HOST=0.0.0.0
+BACKEND_PORT=8000
+BACKEND_URL=http://<EC2_PUBLIC_IP_OR_DOMAIN>:8000
+MODEL_S3_PATH=s3://your-bucket/path/to/fraud_best_model.pkl
+SCALER_S3_PATH=s3://your-bucket/path/to/fraud_scaler.pkl
+```
+- If using S3, attach an IAM role to the EC2 instance with least-privilege S3 access (recommended) instead of embedding AWS keys.
+
+5. Access
+- FastAPI docs: http://<EC2_PUBLIC_IP_OR_DOMAIN>:8000/docs
+- Streamlit UI: http://<EC2_PUBLIC_IP_OR_DOMAIN>:8501
+
+6. Production tips
+- Use Nginx or ALB to:
+  - Terminate TLS (Let's Encrypt)
+  - Route traffic and prevent exposing internal ports
+- Run docker-compose as a service (systemd) or use container orchestration
+- Centralize logs (CloudWatch / ELK) and metrics (Prometheus / Grafana)
+- Add health checks and readiness probes for container lifecycle management
+
+If you'd like, I can:
+- Add a sample `systemd` unit for running docker-compose on boot
+- Add an example Nginx reverse-proxy configuration
+- Replace placeholder <EC2_PUBLIC_IP_OR_DOMAIN> with your instance's public DNS in the README
+
+---
+
+## Monitoring & Production Considerations
+
+- Structured logging (JSON) and centralized log collection (CloudWatch / ELK)
+- Metrics (Prometheus / Grafana)
+- Input schema validation
+- Rate limiting and authentication (API keys / JWT / mTLS)
+- Model drift detection and data / concept drift monitoring
+- Canary deployments for model updates
+- Health checks and readiness probes
+
+---
+
+## Future Enhancements
+
+- Automated model drift detection
+- Scheduled retraining pipelines (CI/CD for models)
+- Ensemble and stacking models
+- Graph-based fraud detection
+- Multi-currency transaction support
+- Role-based access control (RBAC) for APIs
+
+---
+
+## Contributing
+
+- Fork the repository
+- Create a feature branch
+- Add tests and documentation
+- Open a PR with a clear description
+
+Please avoid committing raw/PII-sensitive data or large datasets directly to the repo.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+## Acknowledgments
+
+- Financial transaction dataset providers
+- Machine learning research community
+- Fraud detection industry best practices
